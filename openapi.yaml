@@ -1,0 +1,571 @@
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.1.0
+servers:
+- url: /
+paths:
+  /api/v1/health:
+    get:
+      description: This endpoint is used to check the health of the API.  Returns
+        a JSON object with the key "status" set to "ok".
+      operationId: health_api_v1_health_get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+          description: Successful Response
+      summary: Health
+      tags:
+      - api
+  /api/v1/marker:
+    post:
+      description: |-
+        This endpoint is used to submit a PDF file for conversion to markdown.  A PDF file must be uploaded, and the X-API-Key header must be set to the team's API key.
+        file is the PDF file to be converted to markdown.
+        Returns the converted markdown file and base64 encoded image files.
+      operationId: marker_api_v1_marker_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_marker_api_v1_marker_post'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitialResponse'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - APIKeyHeader: []
+      summary: Marker
+      tags:
+      - api
+  /api/v1/marker/{request_id}:
+    get:
+      operationId: marker_response_api_v1_marker__request_id__get
+      parameters:
+      - explode: false
+        in: path
+        name: request_id
+        required: true
+        schema:
+          title: Request Id
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarkerFinalResponse'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - APIKeyHeader: []
+      summary: Marker Response
+      tags:
+      - api
+  /api/v1/layout:
+    post:
+      description: "This endpoint is used to submit a PDF or image for layout and\
+        \ reading order detection.  The detected layout bboxes on the page will be\
+        \ returned, along with their predicted reading order and layout labels.  More\
+        \ information about the return data and labels is here - https://github.com/VikParuchuri/surya?tab=readme-ov-file#layout-analysis\
+        \ ."
+      operationId: layout_api_v1_layout_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_layout_api_v1_layout_post'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitialResponse'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - APIKeyHeader: []
+      summary: Layout
+      tags:
+      - api
+  /api/v1/layout/{request_id}:
+    get:
+      operationId: layout_response_api_v1_layout__request_id__get
+      parameters:
+      - explode: false
+        in: path
+        name: request_id
+        required: true
+        schema:
+          title: Request Id
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LayoutFinalResponse'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - APIKeyHeader: []
+      summary: Layout Response
+      tags:
+      - api
+  /api/v1/line_detection:
+    post:
+      description: "This endpoint is used to submit a PDF or image for line detection.\
+        \  The detected text lines on the page will be returned, along with their\
+        \ bbox and polygon coordinates."
+      operationId: line_detection_api_v1_line_detection_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_line_detection_api_v1_line_detection_post'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitialResponse'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - APIKeyHeader: []
+      summary: Line Detection
+      tags:
+      - api
+  /api/v1/line_detection/{request_id}:
+    get:
+      operationId: line_detection_response_api_v1_line_detection__request_id__get
+      parameters:
+      - explode: false
+        in: path
+        name: request_id
+        required: true
+        schema:
+          title: Request Id
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineDetectionFinalResponse'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - APIKeyHeader: []
+      summary: Line Detection Response
+      tags:
+      - api
+  /api/v1/ocr:
+    post:
+      description: "This endpoint is used to submit a PDF or image for OCR.  The OCR\
+        \ text lines will be returned, along with their bbox and polygon coordinates.\
+        \  You can submit up to 4 languages used in the document for OCR."
+      operationId: ocr_api_v1_ocr_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_ocr_api_v1_ocr_post'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitialResponse'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - APIKeyHeader: []
+      summary: Ocr
+      tags:
+      - api
+  /api/v1/ocr/{request_id}:
+    get:
+      operationId: ocr_response_api_v1_ocr__request_id__get
+      parameters:
+      - explode: false
+        in: path
+        name: request_id
+        required: true
+        schema:
+          title: Request Id
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCRFinalResponse'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - APIKeyHeader: []
+      summary: Ocr Response
+      tags:
+      - api
+components:
+  schemas:
+    Body_layout_api_v1_layout_post:
+      properties:
+        max_pages:
+          nullable: true
+          type: integer
+        file:
+          description: "Input PDF, word document, powerpoint, or image file, uploaded\
+            \ as multipart form data.  Images must be png, jpg, or webp format."
+          format: binary
+          title: File
+          type: string
+      required:
+      - file
+      title: Body_layout_api_v1_layout_post
+    Body_line_detection_api_v1_line_detection_post:
+      properties:
+        max_pages:
+          nullable: true
+          type: integer
+        file:
+          description: "Input PDF, word document, powerpoint, or image file, uploaded\
+            \ as multipart form data.  Images must be png, jpg, or webp format."
+          format: binary
+          title: File
+          type: string
+      required:
+      - file
+      title: Body_line_detection_api_v1_line_detection_post
+    Body_marker_api_v1_marker_post:
+      properties:
+        max_pages:
+          nullable: true
+          type: integer
+        langs:
+          nullable: true
+          type: string
+        force_ocr:
+          default: false
+          description: Force OCR on all pages of the PDF.  Defaults to False.  This
+            can lead to worse results if you have good text in your PDFs (which is
+            true in most cases).
+          title: Force Ocr
+          type: boolean
+        paginate:
+          default: false
+          description: "Whether to paginate the output.  Defaults to False.  If set\
+            \ to True, each page of the output will be separated by a horizontal rule\
+            \ (2 newlines, 16 - characters, 2 newlines)."
+          title: Paginate
+          type: boolean
+        extract_images:
+          default: true
+          description: "Whether to extract images from the PDF.  Defaults to True.\
+            \  If set to False, no images will be extracted from the PDF."
+          title: Extract Images
+          type: boolean
+        file:
+          description: "Input PDF, word document, or powerpoint, uploaded as multipart\
+            \ form data."
+          format: binary
+          title: File
+          type: string
+      required:
+      - file
+      title: Body_marker_api_v1_marker_post
+    Body_ocr_api_v1_ocr_post:
+      properties:
+        max_pages:
+          nullable: true
+          type: integer
+        langs:
+          nullable: true
+          type: string
+        file:
+          description: "Input PDF, word document, powerpoint, or image file, uploaded\
+            \ as multipart form data.  Images must be png, jpg, or webp format."
+          format: binary
+          title: File
+          type: string
+      required:
+      - file
+      title: Body_ocr_api_v1_ocr_post
+    HTTPValidationError:
+      example:
+        detail:
+        - msg: msg
+          loc:
+          - ValidationError_loc_inner
+          - ValidationError_loc_inner
+          type: type
+        - msg: msg
+          loc:
+          - ValidationError_loc_inner
+          - ValidationError_loc_inner
+          type: type
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+      title: HTTPValidationError
+    HealthResponse:
+      example:
+        status: status
+      properties:
+        status:
+          description: The status of the service.  Should be 'ok' if the service is
+            running correctly.
+          title: Status
+          type: string
+      required:
+      - status
+      title: HealthResponse
+    InitialResponse:
+      example:
+        success: true
+        request_check_url: request_check_url
+        error: error
+        request_id: 0
+      properties:
+        success:
+          default: true
+          description: Whether the request was successful.
+          title: Success
+          type: boolean
+        error:
+          nullable: true
+          type: string
+        request_id:
+          description: The ID of the request. This ID can be used to check the status
+            of the request.
+          title: Request Id
+          type: integer
+        request_check_url:
+          description: The URL to check the status of the request and get results.
+          title: Request Check Url
+          type: string
+      required:
+      - request_check_url
+      - request_id
+      title: InitialResponse
+    LayoutFinalResponse:
+      example:
+        pages:
+        - "{}"
+        - "{}"
+        success: true
+        error: error
+        page_count: 0
+        status: status
+      properties:
+        status:
+          description: The status of the request.  Should be 'complete' when the request
+            is done.
+          title: Status
+          type: string
+        pages:
+          items:
+            type: object
+          nullable: true
+        success:
+          nullable: true
+          type: boolean
+        error:
+          nullable: true
+          type: string
+        page_count:
+          nullable: true
+          type: integer
+      required:
+      - status
+      title: LayoutFinalResponse
+    LineDetectionFinalResponse:
+      example:
+        pages:
+        - "{}"
+        - "{}"
+        success: true
+        error: error
+        page_count: 0
+        status: status
+      properties:
+        status:
+          description: The status of the request.  Should be 'complete' when the request
+            is done.
+          title: Status
+          type: string
+        pages:
+          items:
+            type: object
+          nullable: true
+        success:
+          nullable: true
+          type: boolean
+        error:
+          nullable: true
+          type: string
+        page_count:
+          nullable: true
+          type: integer
+      required:
+      - status
+      title: LineDetectionFinalResponse
+    MarkerFinalResponse:
+      example:
+        images:
+          key: images
+        meta: "{}"
+        success: true
+        markdown: markdown
+        error: error
+        page_count: 0
+        status: status
+      properties:
+        status:
+          description: The status of the request.  Should be 'complete' when the request
+            is done.
+          title: Status
+          type: string
+        markdown:
+          nullable: true
+          type: string
+        images:
+          additionalProperties:
+            type: string
+          nullable: true
+        meta:
+          nullable: true
+          type: object
+        success:
+          nullable: true
+          type: boolean
+        error:
+          nullable: true
+          type: string
+        page_count:
+          nullable: true
+          type: integer
+      required:
+      - status
+      title: MarkerFinalResponse
+    OCRFinalResponse:
+      example:
+        pages:
+        - "{}"
+        - "{}"
+        success: true
+        error: error
+        page_count: 0
+        status: status
+      properties:
+        status:
+          description: The status of the request.  Should be 'complete' when the request
+            is done.
+          title: Status
+          type: string
+        pages:
+          items:
+            type: object
+          nullable: true
+        success:
+          nullable: true
+          type: boolean
+        error:
+          nullable: true
+          type: string
+        page_count:
+          nullable: true
+          type: integer
+      required:
+      - status
+      title: OCRFinalResponse
+    ValidationError:
+      example:
+        msg: msg
+        loc:
+        - ValidationError_loc_inner
+        - ValidationError_loc_inner
+        type: type
+      properties:
+        loc:
+          items:
+            $ref: '#/components/schemas/ValidationError_loc_inner'
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ValidationError_loc_inner:
+      anyOf:
+      - type: string
+      - type: integer
+  securitySchemes:
+    APIKeyHeader:
+      in: header
+      name: X-API-Key
+      type: apiKey

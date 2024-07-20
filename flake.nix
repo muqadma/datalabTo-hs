@@ -16,7 +16,7 @@
         haskellProjects.default = {
           projectRoot = ./.;
           defaults.enable = true;
-          basePackages = pkgs.haskellPackages;
+          basePackages = pkgs.haskell.packages.ghc963;
           autoWire = [ "packages" "apps" "checks" ];
           # The base package set representing a specific GHC version.
           # By default, this is pkgs.haskellPackages.
@@ -29,19 +29,6 @@
           # (defined by `defaults.packages` option).
           #
 
-          packages = {
-            # aeson.source = "1.5.0.0";      # Override aeson to a custom version from Hackage
-            # shower.source = inputs.shower; # Override shower to a custom source path
-          };
-          settings = {
-            #  aeson = {
-            #    check = false;
-            #  };
-            #  relude = {
-            #    haddock = false;
-            #    broken = false;
-            #  };
-          };
 
           devShell = {
             # Enabled by default
