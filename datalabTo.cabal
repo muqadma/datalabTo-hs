@@ -1,4 +1,4 @@
-name:           datalabTo-hs
+name:           datalabTo
 version:        0.1.0.0
 synopsis:       Auto-generated fast API Client
 description:    .
@@ -62,7 +62,7 @@ library
     , unordered-containers
     , vector >=0.10.9 && <0.14
   other-modules:
-      Paths_fast
+      Paths_datalabTo
   exposed-modules:
       Fast
       Fast.API
@@ -91,7 +91,7 @@ test-suite tests
       tests
   ghc-options: -Wall -fno-warn-orphans
   build-depends:
-      fast
+      datalabTo
     , QuickCheck
     , aeson
     , base >=4.7 && <5.0
