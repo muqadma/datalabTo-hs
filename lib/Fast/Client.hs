@@ -157,7 +157,7 @@ dispatchInitUnsafe manager config (InitRequest req) = do
     endpoint =
       T.pack $
       BC.unpack $
-      NH.method req <> " " <> <> NH.host req <> NH.path req <> NH.queryString req
+      NH.method req <> " " <> NH.host req <> NH.path req <> NH.queryString req
     requestLogMsg = "REQ:" <> endpoint
     requestDbgLogMsg =
       "Headers=" <> (T.pack . show) (NH.requestHeaders req) <> " Body=" <>
