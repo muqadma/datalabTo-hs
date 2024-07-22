@@ -109,18 +109,23 @@ pollFinal (c, man) f reqI reqF statusCheck errorCheck = do
           -- Here we check if the response is ready by polling
           -- the endpoint every 2 seconds
           case statusCheck fr of
+            "processing" -> do
+              putStrLn "Processing... Response not ready yet..."
+              recurse
             "completed" -> do
-              putStrLn "Response ready!"
+              putStrLn "Response Ready"
               return $ Just fr
             e' -> do
-              putStrLn "Response not ready yet..."
+              putStrLn $ "Unknown Response Status " <> show e'
               putStrLn $ "Status: " ++ T.unpack e'
-              case errorCheck fr of
-                Nothing -> do
+              maybe recurse couldBeEmpty (errorCheck fr)
+          where
+            recurse = do
                   putStrLn "No error..."
                   putStrLn $ "Polling URL: " ++ show url
                   threadDelay 2000000
                   go (r, url)
-                Just e -> do
-                  putStrLn $ "Error in final response: " <> show e
-                  return Nothing
+            couldBeEmpty e = do
+                  if (e /= T.empty)
+                  then ((putStrLn $ "Error in final response: " <> show e) >> return Nothing)
+                  else recurse
