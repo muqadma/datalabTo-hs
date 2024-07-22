@@ -49,6 +49,8 @@ import Data.Function ((&))
 import Data.Monoid ((<>))
 import Data.Text (Text)
 import GHC.Exts (IsString(..))
+import Control.Monad.IO.Class (MonadIO(liftIO))
+import qualified Network.HTTP.Client as HN
 
 -- * Dispatch
 
@@ -62,7 +64,13 @@ dispatchLbs
   -> FastRequest req contentType res accept -- ^ request
   -> IO (NH.Response BCL.ByteString) -- ^ response
 dispatchLbs manager config request  = do
-  initReq <- _toInitRequest config request
+  initReq' <- _toInitRequest config request
+  initReq <- modifyInitRequestM initReq' $ \req -> do
+    -- DO NOT CHANGE THIS REDIRECTING IS FUCKED IF www. disappears
+    let req' = req { HN.host = "www.datalab.to"
+                   , HN.redirectCount = 0
+                   , HN.shouldStripHeaderOnRedirectIfOnDifferentHostOnly = True }
+    pure req'
   dispatchInitUnsafe manager config initReq
 
 -- ** Mime
@@ -143,12 +151,13 @@ dispatchInitUnsafe manager config (InitRequest req) = do
        _log src levelInfo (responseLogMsg res)
        _log src levelDebug ((T.pack . show) res)
        return res
+
   where
     src = "Client"
     endpoint =
       T.pack $
       BC.unpack $
-      NH.method req <> " " <> NH.host req <> NH.path req <> NH.queryString req
+      NH.method req <> " " <> <> NH.host req <> NH.path req <> NH.queryString req
     requestLogMsg = "REQ:" <> endpoint
     requestDbgLogMsg =
       "Headers=" <> (T.pack . show) (NH.requestHeaders req) <> " Body=" <>

@@ -196,6 +196,7 @@ markerApiV1MarkerPost (File file) =
     `_hasAuthType` (P.Proxy :: P.Proxy AuthApiKeyAPIKeyHeader)
     `_addMultiFormPart` NH.partFileSource "file" file
 
+
 data MarkerApiV1MarkerPost  
 instance HasOptionalParam MarkerApiV1MarkerPost MaxPages where
   applyOptionalParam req (MaxPages xs) =
@@ -264,6 +265,7 @@ ocrApiV1OcrPost (File file) =
   _mkRequest "POST" ["/api/v1/ocr"]
     `_hasAuthType` (P.Proxy :: P.Proxy AuthApiKeyAPIKeyHeader)
     `_addMultiFormPart` NH.partFileSource "file" file
+
 
 data OcrApiV1OcrPost  
 instance HasOptionalParam OcrApiV1OcrPost MaxPages where

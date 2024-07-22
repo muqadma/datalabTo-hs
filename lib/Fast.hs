@@ -15,10 +15,11 @@ module Fast
   , module Fast.ModelLens
   , withConfig
   , pollFinal
-  , ocrPoll
-  , layoutPoll
-  , lineDetectionPoll
-  , markerPoll
+  , ocr'
+  , layout'
+  , lineDetection'
+  , marker'
+  , ocr
   ) where
 
 import Fast.API
@@ -35,14 +36,10 @@ import Data.Text (Text)
 import Control.Concurrent (threadDelay)
 import qualified Data.Text as T
 
-
 config :: Text -> IO (FastConfig, Manager)
 config token = (,)
   <$> (flip addAuthMethod (AuthApiKeyAPIKeyHeader token) <$> newConfig)
   <*> newManager tlsManagerSettings
-
-
-
 
 handleInitialResponse :: InitialResponse -> IO (Maybe (RequestId, Text))
 handleInitialResponse ir = do
@@ -67,25 +64,27 @@ handleInitialResponse ir = do
           putStrLn "No error message"
           return Nothing
 
-
 type FastEnv = (FastConfig, Manager)
 
 withConfig :: Text -> (FastEnv -> IO a) -> IO a
 withConfig token f = f =<< config token
 
+ocr :: FastEnv -> [FilePath] -> IO [Maybe OCRFinalResponse]
+ocr env fs = mapM (ocr' env) fs
 
-ocrPoll :: FastEnv -> File -> IO (Maybe OCRFinalResponse)
-ocrPoll env f = pollFinal env f ocrApiV1OcrPost ocrResponseApiV1OcrRequestIdGet oCRFinalResponseStatus oCRFinalResponseError
+ocr' :: FastEnv -> FilePath -> IO (Maybe OCRFinalResponse)
+ocr' env f = pollFinal env (File f) p ocrResponseApiV1OcrRequestIdGet oCRFinalResponseStatus oCRFinalResponseError
+  where
+    p = flip applyOptionalParam (Langs "english,urdu") . ocrApiV1OcrPost
 
-layoutPoll :: FastEnv -> File -> IO (Maybe LayoutFinalResponse)
-layoutPoll env f = pollFinal env f layoutApiV1LayoutPost layoutResponseApiV1LayoutRequestIdGet layoutFinalResponseStatus layoutFinalResponseError
+layout' :: FastEnv -> FilePath -> IO (Maybe LayoutFinalResponse)
+layout' env f = pollFinal env (File f) layoutApiV1LayoutPost layoutResponseApiV1LayoutRequestIdGet layoutFinalResponseStatus layoutFinalResponseError
 
-lineDetectionPoll :: FastEnv -> File -> IO (Maybe LineDetectionFinalResponse)
-lineDetectionPoll env f = pollFinal env f lineDetectionApiV1LineDetectionPost lineDetectionResponseApiV1LineDetectionRequestIdGet lineDetectionFinalResponseStatus lineDetectionFinalResponseError
+lineDetection' :: FastEnv -> FilePath -> IO (Maybe LineDetectionFinalResponse)
+lineDetection' env f = pollFinal env (File f) lineDetectionApiV1LineDetectionPost lineDetectionResponseApiV1LineDetectionRequestIdGet lineDetectionFinalResponseStatus lineDetectionFinalResponseError
 
-markerPoll :: FastEnv -> File -> IO (Maybe MarkerFinalResponse)
-markerPoll env f = pollFinal env f markerApiV1MarkerPost markerResponseApiV1MarkerRequestIdGet markerFinalResponseStatus markerFinalResponseError
-
+marker' :: FastEnv -> FilePath -> IO (Maybe MarkerFinalResponse)
+marker' env f = pollFinal env (File f) markerApiV1MarkerPost markerResponseApiV1MarkerRequestIdGet markerFinalResponseStatus markerFinalResponseError
 
 pollFinal :: forall reqI contentTypeI acceptI reqF contentTypeF resF acceptF.
   (Produces reqI acceptI, MimeUnrender acceptI InitialResponse, MimeType contentTypeI)
@@ -97,6 +96,7 @@ pollFinal :: forall reqI contentTypeI acceptI reqF contentTypeF resF acceptF.
   -> (resF -> Maybe Text)
   -> IO (Maybe resF)
 pollFinal (c, man) f reqI reqF statusCheck errorCheck = do
+  print (reqI f)
   either onL onR =<< dispatchMime' man c (reqI f)
   where
     onR ir = handleInitialResponse ir >>= maybe (return Nothing) go

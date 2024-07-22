@@ -108,7 +108,7 @@ newConfig :: IO FastConfig
 newConfig = do
     logCxt <- initLogContext
     return $ FastConfig
-        { configHost = "https://datalab.to/"
+        { configHost = "https://datalab.to"
         , configUserAgent = "muqadma/0.1.0.0"
         , configLogExecWithContext = runDefaultLogExecWithContext
         , configLogContext = logCxt
