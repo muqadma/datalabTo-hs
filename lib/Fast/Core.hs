@@ -24,6 +24,7 @@ Module : Fast.Core
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE TypeOperators  #-}
 {-# OPTIONS_GHC -fno-warn-name-shadowing -fno-warn-unused-binds -fno-warn-unused-imports #-}
 
 module Fast.Core where
@@ -71,6 +72,7 @@ import Data.Monoid ((<>))
 import Data.Text (Text)
 import Prelude (($), (.), (&&), (<$>), (<*>), Maybe(..), Bool(..), Char, String, fmap, mempty, pure, return, show, IO, Monad, Functor, maybe)
 
+
 -- * FastConfig
 
 -- |
@@ -106,8 +108,8 @@ newConfig :: IO FastConfig
 newConfig = do
     logCxt <- initLogContext
     return $ FastConfig
-        { configHost = "http://localhost"
-        , configUserAgent = "datalab-to/0.1.0.0"
+        { configHost = "https://datalab.to/"
+        , configUserAgent = "muqadma/0.1.0.0"
         , configLogExecWithContext = runDefaultLogExecWithContext
         , configLogContext = logCxt
         , configAuthMethods = []

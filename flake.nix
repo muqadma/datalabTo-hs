@@ -11,24 +11,20 @@
 
       perSystem = { self', pkgs, ... }: {
 
+
         # Typically, you just want a single project named "default". But
         # multiple projects are also possible, each using different GHC version.
         haskellProjects.default = {
           projectRoot = ./.;
           defaults.enable = true;
           basePackages = pkgs.haskell.packages.ghc963;
-          autoWire = [ "packages" "apps" "checks" ];
-          # The base package set representing a specific GHC version.
-          # By default, this is pkgs.haskellPackages.
-          # You may also create your own. See https://community.flake.parts/haskell-flake/package-set
-          # basePackages = pkgs.haskellPackages;
+          autoWire = [ "packages" "apps" "checks" "devShells" ];
 
-          # Extra package information. See https://community.flake.parts/haskell-flake/dependency
-          #
-          # Note that local packages are automatically included in `packages`
-          # (defined by `defaults.packages` option).
-          #
-
+          settings = {
+            datalabTo = {
+              extraBuildDepends = [ pkgs.zlib ];
+            };
+          };
 
           devShell = {
             # Enabled by default
