@@ -112,7 +112,7 @@ pollFinal (c, man) f reqI reqF statusCheck errorCheck = do
             "processing" -> do
               putStrLn "Processing... Response not ready yet..."
               recurse
-            "completed" -> do
+            "complete" -> do
               putStrLn "Response Ready"
               return $ Just fr
             e' -> do
